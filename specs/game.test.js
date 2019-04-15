@@ -1,7 +1,8 @@
 const Game = require('../game');
 const Card = require('../card');
+const Player = require('../player');
 
-describe ('Game', () => {
+describe('Game', () => {
 
   let top_trumps;
   let deck = []
@@ -11,6 +12,9 @@ describe ('Game', () => {
   let the_flash;
   let wonder_woman;
   let batman;
+  let player1;
+  let player2;
+
 
   beforeEach(() => {
     superman = new Card('Superman', 6, 9, 7)
@@ -26,6 +30,8 @@ describe ('Game', () => {
     top_trumps.addCard(the_flash);
     top_trumps.addCard(wonder_woman);
     top_trumps.addCard(batman);
+    player1 = new Player(1, []);
+    player2 = new Player(2, []);
   });
   test('game should be able to add cards to deck', () => {
     top_trumps.addCard(superman);
@@ -35,17 +41,56 @@ describe ('Game', () => {
     expect(top_trumps.deck.length).toBe(6);
   })
 
-  xtest('should be able to deal cards evenly to players', () => {
+  test('game should be able to remove card from top of deck', () => {
+    top_trumps.removeCardFromDeck();
+    expect(top_trumps.deck[0].name).toBe('Scarlet Witch');
+  })
 
+  test('should be able to deal cards evenly to players', () => {
+    top_trumps.deal(player1, player2)
+    expect(top_trumps.deck.length).toBe(0);
+    expect(player1.hand.length).toBe(3);
+    expect(player2.hand.length).toBe(3);
   });
-  xtest('should be able to check if one player has all the cards', () => {
-
+  test('should be able to check if one player has all the cards', () => {
+    top_trumps.deal(player1, player2);
+    player1.addCardToHand(superman);
+    player1.addCardToHand(wonder_woman);
+    player1.addCardToHand(batman);
+    expect(top_trumps.checkWinner(player1)).toBe(true);
   });
-  xtest('should be able to compare the attributes chosen by the players', () => {
 
+  test('should be able to compare the attributes chosen by the players', () => {
+
+    top_trumps.deal(player1, player2);
+
+    player1.playCard(top_trumps);
+
+    player2.playCard(top_trumps);
+
+    expect(top_trumps.compare('strength', player1)).toBe('player2')
   });
-  xtest('should be able to give both cards to the player that wins the round', () => {
+  test('should be able to give both cards to the player that wins the round', () => {
+    top_trumps.deal(player1, player2);
 
+    player1.playCard(top_trumps);
+
+    player2.playCard(top_trumps);
+
+    top_trumps.giveCardsToWinner(top_trumps.compare('strength', player1), player1, player2);
+    expect
+
+    expect(player2.hand.length).toBe(4);
+    expect(player1.hand.length).toBe(2);
+
+  })
+
+  test('game should play by picking which players turn it is and which attribute they wish to pick', () => {
+    top_trumps.deal(player1, player2);
+
+    top_trumps.playgame('strength', player1, player2);
+    expect(player2.hand.length).toBe(4);
+    expect(player1.hand.length).toBe(2);
   })
 
 });
